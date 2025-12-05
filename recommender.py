@@ -23,8 +23,7 @@ def load_recommender():
     ]
 
     X_emb = df[feature_cols].to_numpy()
-
-      return df, nn, X_emb
+    return df, nn, X_emb
 # ------------------------------------------------
 # FUNCIÓN DE RECOMENDACIÓN PRINCIPAL
 # ------------------------------------------------
@@ -111,6 +110,7 @@ def recommend_by_track_id(track_id, nn, df, X_emb, k_fixed=3, k_random=7, top_N=
 
 
     return final_df
+
 
 
 
