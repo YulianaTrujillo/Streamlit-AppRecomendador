@@ -11,15 +11,20 @@ import streamlit as st
 DF_PATH = "data/df_weighted.csv"
 MODEL_PATH = "model/nn_cosine_model.joblib"
 
-df = pd.read_csv(DF_PATH)
-nn_model = joblib.load(MODEL_PATH)
+def load_recommender():
+  
+    df = pd.read_csv(DF_PATH)
+    nn = joblib.load(MODEL_PATH)
 
-#Seleccion de variables para pasarlas por el modelo
-feature_cols = [c for c in df.columns if c not in 
-                ["track_id", "track_name", "artists", "album_name", "track_genre"]]
+    # Selección de variables
+    feature_cols = [
+        c for c in df.columns if c not in
+        ["track_id", "track_name", "artists", "album_name", "track_genre"]
+    ]
 
-X_emb = df[feature_cols].to_numpy()
+    X_emb = df[feature_cols].to_numpy()
 
+      return df, nn, X_emb
 # ------------------------------------------------
 # FUNCIÓN DE RECOMENDACIÓN PRINCIPAL
 # ------------------------------------------------
@@ -106,5 +111,6 @@ def recommend_by_track_id(track_id, nn, df, X_emb, k_fixed=3, k_random=7, top_N=
 
 
     return final_df
+
 
 
