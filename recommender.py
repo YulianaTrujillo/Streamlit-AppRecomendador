@@ -7,39 +7,12 @@ import streamlit as st
 # ------------------------------------------------
 # CARGA DEL MODELO Y LOS DATOS
 # --------------------------------------
-# URLs se leerán desde los secrets de Streamlit Cloud
-MODEL_URL = st.secrets["MODEL_URL"]
-DF_URL = st.secrets["DF_URL"]
-
-MODEL_PATH = "model/nn_cosine_model.joblib"
+# Rutas locales donde app.py va a guardar los archivos
 DF_PATH = "data/df_weighted.csv"
+MODEL_PATH = "model/nn_cosine_model.joblib"
 
-@st.cache_resource
-def load_model():
-    if not os.path.exists(MODEL_PATH):
-        os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
-        with requests.get(MODEL_URL, stream=True) as r:
-            r.raise_for_status()
-            with open(MODEL_PATH, "wb") as f:
-                for chunk in r.iter_content(chunk_size=8192):
-                    if chunk:
-                        f.write(chunk)
-    return joblib.load(MODEL_PATH)
-
-@st.cache_resource
-def load_df():
-    if not os.path.exists(DF_PATH):
-        os.makedirs(os.path.dirname(DF_PATH), exist_ok=True)
-        with requests.get(DF_URL, stream=True) as r:
-            r.raise_for_status()
-            with open(DF_PATH, "wb") as f:
-                for chunk in r.iter_content(chunk_size=8192):
-                    if chunk:
-                        f.write(chunk)
-    return pd.read_csv(DF_PATH)
-
-df = load_df()
-nn = load_model()
+df = pd.read_csv(DF_PATH)
+nn_model = joblib.load(MODEL_PATH)
 
 #Seleccion de variables para pasarlas por el modelo
 feature_cols = [c for c in df.columns if c not in 
@@ -133,4 +106,5 @@ def recommend_by_track_id(track_id, nn, df, X_emb, k_fixed=3, k_random=7, top_N=
 
 
     return final_df
+
 
