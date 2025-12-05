@@ -9,10 +9,11 @@ DF_URL = st.secrets["DF_URL"]
 MODEL_PATH = "model/nn_cosine_model.joblib"
 DF_PATH = "data/df_weighted.csv"
 
-
 @st.cache_resource
 def ensure_files():
-    # Descargar modelo si no existe
+    """Descarga modelo y dataset si no existen en disco."""
+
+    # Modelo
     if not os.path.exists(MODEL_PATH):
         os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
         with requests.get(MODEL_URL, stream=True) as r:
@@ -22,7 +23,7 @@ def ensure_files():
                     if chunk:
                         f.write(chunk)
 
-    # Descargar DF si no existe
+    # Dataset
     if not os.path.exists(DF_PATH):
         os.makedirs(os.path.dirname(DF_PATH), exist_ok=True)
         with requests.get(DF_URL, stream=True) as r:
@@ -35,17 +36,18 @@ def ensure_files():
     return MODEL_PATH, DF_PATH
 
 @st.cache_resource
-def load_recommender():
-    # Asegurarnos de que los archivos están descargados
+def load_recommender_wrapper():
+    """Asegura descargas y luego importa recommender.py correctamente."""
     ensure_files()
 
-    # Importar recommender DESPUÉS de tener los archivos
-    from recommender import df, nn, X_emb, recommend_by_track_id
+    # Ahora importamos el módulo, los archivos YA existen
+    from recommender import load_recommender, recommend_by_track_id
 
+    df, nn, X_emb = load_recommender()
     return df, nn, X_emb, recommend_by_track_id
 
 st.write("Cargando modelo y datos...")
-df, nn, X_emb, recommend_by_track_id = load_recommender()
+df, nn, X_emb, recommend_by_track_id = load_recommender_wrapper()
 st.success("Modelo y DF cargados correctamente.")
 
 st.set_page_config(page_title="Music Recommender", layout="centered")
@@ -114,5 +116,6 @@ if st.button("Recomendar"):
 
         except Exception as e:
             st.error(f"Error: {str(e)}")
+
 
 
