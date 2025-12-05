@@ -38,10 +38,8 @@ def load_df():
                         f.write(chunk)
     return pd.read_csv(DF_PATH)
 
-
-
-#df = pd.read_csv("df_weighted.csv")
-#nn = joblib.load("nn_cosine_model.joblib")
+df = load_df()
+nn = load_model()
 
 #Seleccion de variables para pasarlas por el modelo
 feature_cols = [c for c in df.columns if c not in 
@@ -135,3 +133,4 @@ def recommend_by_track_id(track_id, nn, df, X_emb, k_fixed=3, k_random=7, top_N=
 
 
     return final_df
+
