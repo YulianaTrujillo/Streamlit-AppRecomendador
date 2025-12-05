@@ -39,7 +39,6 @@ def ensure_files():
 def load_recommender_wrapper():
     """Asegura descargas y luego importa recommender.py correctamente."""
     ensure_files()
-
     # Ahora importamos el módulo, los archivos YA existen
     from recommender import load_recommender, recommend_by_track_id
 
@@ -116,6 +115,7 @@ if st.button("Recomendar"):
 
         except Exception as e:
             st.error(f"Error: {str(e)}")
+
 
 
 
