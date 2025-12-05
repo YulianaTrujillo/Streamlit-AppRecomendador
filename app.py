@@ -34,7 +34,6 @@ def ensure_files():
 
     return MODEL_PATH, DF_PATH
 
-
 @st.cache_resource
 def load_recommender():
     # Asegurarnos de que los archivos están descargados
@@ -45,13 +44,14 @@ def load_recommender():
 
     return df, nn, X_emb, recommend_by_track_id
 
-
+st.write("Cargando modelo y datos...")
+df, nn, X_emb, recommend_by_track_id = load_recommender()
+st.success("Modelo y DF cargados correctamente.")
 
 st.set_page_config(page_title="Music Recommender", layout="centered")
 
 st.title("Recomendador de Música")
 st.write("Busca una canción y obtén recomendaciones similares usando tu modelo optimizado.")
-
 
 # ------------------------------------------------
 # BUSCADOR DE CANCIONES
@@ -114,4 +114,5 @@ if st.button("Recomendar"):
 
         except Exception as e:
             st.error(f"Error: {str(e)}")
+
 
