@@ -1,6 +1,51 @@
 import streamlit as st
 import pandas as pd
-from recommender import df, nn, X_emb, recommend_by_track_id
+import os
+import requests
+
+MODEL_URL = st.secrets["MODEL_URL"]
+DF_URL = st.secrets["DF_URL"]
+
+MODEL_PATH = "model/nn_cosine_model.joblib"
+DF_PATH = "data/df_weighted.csv"
+
+
+@st.cache_resource
+def ensure_files():
+    # Descargar modelo si no existe
+    if not os.path.exists(MODEL_PATH):
+        os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
+        with requests.get(MODEL_URL, stream=True) as r:
+            r.raise_for_status()
+            with open(MODEL_PATH, "wb") as f:
+                for chunk in r.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+
+    # Descargar DF si no existe
+    if not os.path.exists(DF_PATH):
+        os.makedirs(os.path.dirname(DF_PATH), exist_ok=True)
+        with requests.get(DF_URL, stream=True) as r:
+            r.raise_for_status()
+            with open(DF_PATH, "wb") as f:
+                for chunk in r.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+
+    return MODEL_PATH, DF_PATH
+
+
+@st.cache_resource
+def load_recommender():
+    # Asegurarnos de que los archivos están descargados
+    ensure_files()
+
+    # Importar recommender DESPUÉS de tener los archivos
+    from recommender import df, nn, X_emb, recommend_by_track_id
+
+    return df, nn, X_emb, recommend_by_track_id
+
+
 
 st.set_page_config(page_title="Music Recommender", layout="centered")
 
@@ -69,3 +114,4 @@ if st.button("Recomendar"):
 
         except Exception as e:
             st.error(f"Error: {str(e)}")
+
